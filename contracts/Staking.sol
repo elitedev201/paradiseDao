@@ -562,7 +562,7 @@ contract UTOPStaking is Ownable {
         epoch = Epoch({
             length: _epochLength,
             number: _firstEpochNumber,
-            endTime: _firstEpochTime,
+            endTime:  28800,
             distribute: 0
         });
     }

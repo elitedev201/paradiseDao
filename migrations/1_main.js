@@ -67,9 +67,9 @@ module.exports = async function (deployer, network, accounts) {
   await deployer.deploy(_UTOPStaking,
     UTOPERC20Token.address,
     sUTOP.address,
-    epochLength,
-    firstEpochNumber,
-    firstEpochBlock);
+    28000,
+    0,
+    28000);
   const UTOPStaking = await _UTOPStaking.deployed();
   yellow('UTOPStaking: end');
 
