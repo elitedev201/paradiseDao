@@ -430,7 +430,7 @@ contract Distributor is Ownable {
     function addRecipient( address _recipient, uint _rewardRate ) external onlyOwner {
         require( _recipient != address(0), "IA" );
         require(_rewardRate <= 5000, "Too high reward rate");
-        require(info.length <= 4, "limit recipients max to 5");
+        // require(info.length <= 4, "limit recipients max to 5");
         info.push( Info({
             recipient: _recipient,
             rate: _rewardRate

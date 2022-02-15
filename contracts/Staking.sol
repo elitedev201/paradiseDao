@@ -533,6 +533,7 @@ contract UTOPStaking is Ownable {
 
     IDistributor public distributor;
     
+    address public locker;
     uint public totalBonus;
     
     IWarmup public warmupContract;
@@ -562,7 +563,7 @@ contract UTOPStaking is Ownable {
         epoch = Epoch({
             length: _epochLength,
             number: _firstEpochNumber,
-            endTime:  28800,
+            endTime: _firstEpochTime,
             distribute: 0
         });
     }
@@ -691,8 +692,31 @@ contract UTOPStaking is Ownable {
         return Time.balanceOf( address(this) ).add( totalBonus );
     }
 
-    enum CONTRACTS { DISTRIBUTOR, WARMUP }
+    /**
+        @notice provide bonus to locked staking contract
+        @param _amount uint
+     */
+    function giveLockBonus( uint _amount ) external {
+        require( msg.sender == locker );
+        totalBonus = totalBonus.add( _amount );
+        /// change this
+        // IERC20( Memories ).safeTransfer( locker, _amount );
+        Memories.safeTransfer( locker, _amount );
+    }
 
+    /**
+        @notice reclaim bonus from locked staking contract
+        @param _amount uint
+     */
+    function returnLockBonus( uint _amount ) external {
+        require( msg.sender == locker );
+        totalBonus = totalBonus.sub( _amount );
+        //change this
+        Memories.safeTransferFrom( locker, address(this), _amount );
+        // IERC20( Memories ).safeTransferFrom( locker, address(this), _amount );
+    }
+
+    enum CONTRACTS { DISTRIBUTOR, WARMUP, LOCKER }
     /**
         @notice sets the contract address for LP staking
         @param _contract address
@@ -703,6 +727,9 @@ contract UTOPStaking is Ownable {
         } else if ( _contract == CONTRACTS.WARMUP ) { // 1
             require( address(warmupContract) == address( 0 ), "Warmup cannot be set more than once" );
             warmupContract = IWarmup(_address);
+        } else if ( _contract == CONTRACTS.LOCKER ) { // 2
+            require( locker == address(0), "Locker cannot be set more than once" );
+            locker = _address;
         }
         emit LogSetContract(_contract, _address);
     }
@@ -716,3 +743,5 @@ contract UTOPStaking is Ownable {
         emit LogWarmupPeriod(_warmupPeriod);
     }
 }
+
+
